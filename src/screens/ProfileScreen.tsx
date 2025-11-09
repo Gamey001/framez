@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   View,
   Text,
@@ -13,13 +13,21 @@ import { useAuth } from "../contexts/AuthContext";
 import { usePosts } from "../contexts/PostContext";
 import { Post } from "../types";
 import { Ionicons } from "@expo/vector-icons";
+import { useFocusEffect } from "@react-navigation/native";
 
 const { width } = Dimensions.get("window");
 const imageSize = width / 3 - 2;
 
 export default function ProfileScreen() {
   const { user, signOut } = useAuth();
-  const { userPosts } = usePosts();
+  const { userPosts, refreshUserPosts } = usePosts();
+
+  // Refresh posts when screen is focused
+  useFocusEffect(
+    React.useCallback(() => {
+      refreshUserPosts();
+    }, [])
+  );
 
   const handleSignOut = () => {
     Alert.alert("Log Out", "Are you sure you want to log out?", [

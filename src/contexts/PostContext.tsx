@@ -2,7 +2,6 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { Post, PostContextType } from "../types";
 import { useAuth } from "./AuthContext";
-import * as FileSystem from "expo-file-system";
 
 const PostContext = createContext<PostContextType | undefined>(undefined);
 
@@ -35,14 +34,32 @@ export function PostProvider({ children }: { children: React.ReactNode }) {
   const refreshUserPosts = async () => {
     if (!user) return;
 
-    const { data, error } = await supabase
-      .from("posts")
-      .select("*, profiles(*)")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false });
+    try {
+      const { data, error } = await supabase
+        .from("posts")
+        .select(
+          `
+          *,
+          profiles (
+            id,
+            username,
+            avatar_url
+          )
+        `
+        )
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
 
-    if (data && !error) {
-      setUserPosts(data);
+      if (error) {
+        console.error("Error fetching user posts:", error);
+        return;
+      }
+
+      if (data) {
+        setUserPosts(data);
+      }
+    } catch (error) {
+      console.error("Error in refreshUserPosts:", error);
     }
   };
 
@@ -50,24 +67,23 @@ export function PostProvider({ children }: { children: React.ReactNode }) {
     if (!user) throw new Error("User not authenticated");
 
     try {
-      // Read file as base64
-      const base64 = await FileSystem.readAsStringAsync(imageUri, {
-        encoding: "base64" as any,
-      });
+      // Fetch the image as a blob
+      const response = await fetch(imageUri);
+      const blob = await response.blob();
 
-      // Convert base64 to array buffer
-      const byteCharacters = atob(base64);
-      const byteNumbers = new Array(byteCharacters.length);
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-      }
-      const byteArray = new Uint8Array(byteNumbers);
+      // Convert blob to array buffer
+      const arrayBuffer = await new Promise<ArrayBuffer>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as ArrayBuffer);
+        reader.onerror = reject;
+        reader.readAsArrayBuffer(blob);
+      });
 
       // Upload to Supabase Storage
       const fileName = `${user.id}/${Date.now()}.jpg`;
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from("posts")
-        .upload(fileName, byteArray, {
+        .upload(fileName, arrayBuffer, {
           contentType: "image/jpeg",
         });
 
