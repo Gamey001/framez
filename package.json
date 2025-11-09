@@ -32,7 +32,7 @@
   "devDependencies": {
     "@babel/core": "^7.20.0",
     "@expo/vector-icons": "^15.0.3",
-    "@types/react": "~19.1.10",
+    "@types/react": "^19.1.1",
     "babel-plugin-module-resolver": "^5.0.2",
     "typescript": "^5.3.0"
   },
