@@ -11,9 +11,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.framez.app"
@@ -25,16 +23,14 @@
       },
       "package": "com.framez.app"
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
     "plugins": [
       [
         "expo-image-picker",
         {
           "photosPermission": "The app needs access to your photos to let you share images."
         }
-      ]
+      ],
+      "expo-font"
     ]
   }
 }
