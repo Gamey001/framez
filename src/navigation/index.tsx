@@ -5,6 +5,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { useAuth } from "../contexts/AuthContext";
 import { ActivityIndicator, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import WebContainer from "../components/WebContainer";
 
 // Screens
 import LoginScreen from "../screens/LoginScreen";
@@ -78,8 +79,10 @@ export default function Navigation() {
   }
 
   return (
-    <NavigationContainer>
-      {user ? <MainTabs /> : <AuthStack />}
-    </NavigationContainer>
+    <WebContainer>
+      <NavigationContainer>
+        {user ? <MainTabs /> : <AuthStack />}
+      </NavigationContainer>
+    </WebContainer>
   );
 }
