@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   postImage: {
-    width: width,
+    maxWidth: '100%',
     height: width,
     backgroundColor: "#efefef",
   },
